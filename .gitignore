@@ -1,0 +1,8 @@
+messidor/.DS_Store
+messidor/node_modules/
+messidor/dist/
+messidor/npm-debug.log*
+messidor/yarn-debug.log*
+messidor/yarn-error.log*
+messidor/.lavas/
+messidor/.nyc_output
