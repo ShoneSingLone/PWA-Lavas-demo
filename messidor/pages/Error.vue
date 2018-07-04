@@ -9,11 +9,12 @@ export default {
     name: 'error',
     computed: {
         message() {
-            return this.$route.params.error || '您访问的路径不存在';
+            return this.$route.params.error || 'Oops! Something is not quite right o(╥﹏╥)o 就是404';
         }
     },
     created() {
         let query = this.$route.query;
+        debugger;
         if (Object.keys(query).length !== 0) {
             this.$router.replace({
                 name: 'error',
