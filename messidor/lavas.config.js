@@ -4,9 +4,9 @@
  */
 
 'use strict';
-
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const path = require('path');
-const BUILD_PATH = path.resolve(__dirname, 'dist');
+const BUILD_PATH = path.resolve(__dirname, 'final');
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -14,15 +14,25 @@ module.exports = {
     build: {
         ssr: false,
         path: BUILD_PATH,
-        publicPath: '/',
-        ssrCopy: isDev ? [] : [
-            {
+        publicPath: "../../",
+        ssrCopy: isDev ? [] : [{
                 src: 'server.prod.js'
             },
             {
                 src: 'package.json'
             }
         ],
+        plugins: {
+            // base: [
+            //     new CopyWebpackPlugin([{
+            //         from: path.resolve(__dirname, './static'),
+            //         to: path.resolve(__dirname, './abc'),
+            //         // ignore: ['.*']
+            //     }])
+            // ],
+            client: [],
+            server: []
+        },
         /**
          * alias for webpack
          *
