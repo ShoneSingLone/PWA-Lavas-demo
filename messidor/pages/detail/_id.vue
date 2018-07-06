@@ -24,8 +24,8 @@
           </p>
         </article>
       </v-flex>
-    </v-layout>
-  </div>
+    </v-layout
+>  </div>
 </template>
 
 <script>
@@ -84,13 +84,10 @@ export default {
       'store.getters["detail/weather"]',
       store.getters["detail/weather"]
     );
-    let result = await store.dispatch("detail/setWeather", { woeid: 2151849 });
-    console.log(result);
-    debugger;
+    await store.dispatch("detail/setWeather", { woeid: 2151849 });
   },
   computed: {
     weather() {
-      console.log("fasdfasdf", this.weather);
       debugger;
       console.log("fasdfasdf", this.$store.getters["detail/weather"]);
       return this.$store.getters["detail/weather"];

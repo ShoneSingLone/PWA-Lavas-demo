@@ -56,12 +56,11 @@ export default {
     ]
   },
   async asyncData({ store, route }) {
-    let result = await axios(
-      ``
-    );
-    console.log((this.list = result.data));
+    let result = await axios(``);
+    // console.log((this.list = result.data));
+    this.list = result.data;
     console.log(this.list.length);
-    debugger;
+    // debugger;
     setState(store);
   },
   activated() {

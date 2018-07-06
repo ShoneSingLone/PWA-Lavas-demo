@@ -50,15 +50,34 @@ module.exports = {
          */
         nodeExternalsWhitelist: [
             /iscroll/
-        ]
+        ],
+        bundleAnalyzerReport: true,
+        babel: {
+            plugins: [
+                "transform-runtime", ["transform-imports",
+                    {
+                        "vuetify": {
+                            "transform": "vuetify/es5/components/${member}",
+                            "preventFullImport": true
+                        }
+                    }
+                ]
+            ]
+        }
     },
     router: {
-        mode: 'history',
+        mode: 'hash',
+        // mode: 'history',
         base: '/',
         pageTransition: {
             type: 'slide',
             transitionClass: 'slide'
         }
+    },
+    middleware: {
+        all: [], // 前后端均执行
+        server: [], // 仅服务器端执行
+        client: ['login-client'] // 仅浏览器端执行
     },
     serviceWorker: {
         swSrc: path.join(__dirname, 'core/service-worker.js'),

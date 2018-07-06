@@ -13,11 +13,27 @@ import {
     createStore
 } from '@/.lavas/store';
 import AppComponent from './App.vue';
-import Vuetify from 'vuetify';
+import {
+    Vuetify,
+    VApp,
+    VBtn,
+    VIcon,
+    VGrid //{ VContainer, VContent, VFlex, VLayout, VSpacer }
+} from 'vuetify';
+// import Vuetify from 'vuetify';
 
 Vue.use(Meta); //对header信息title meta进行修改
 
-Vue.use(Vuetify);
+// Vue.use(Vuetify);
+// 按需加载
+Vue.use(Vuetify, {
+    components: {
+        VApp,
+        VBtn,
+        VIcon,
+        ...VGrid
+    }
+});
 
 Vue.config.productionTip = false;
 

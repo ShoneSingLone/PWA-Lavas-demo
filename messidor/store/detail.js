@@ -74,7 +74,6 @@ export const mutations = {
         weatherText,
         weatherTemp
     }) {
-        debugger;
         state.weather = {
             text: weatherText,
             temp: weatherTemp
@@ -91,7 +90,6 @@ export const actions = {
             let result = await axios(url);
 
             let condition = result.data.query.results.channel.item.condition;
-            debugger;
             commit(SET_WEATHER, {
                 weatherText: condition.text,
                 weatherTemp: condition.temp

@@ -1,5 +1,5 @@
 {
-    "mode": "history",
+    "mode": "hash",
     "base": "/",
     "routes": [
         {
@@ -18,9 +18,26 @@
             "meta": {}
         },
         {
+            "path": "/login",
+            "name": "login",
+            "meta": {}
+        },
+        {
             "path": "/search",
             "name": "search",
             "meta": {}
+        },
+        {
+            "path": "/test",
+            "name": "test",
+            "meta": {},
+            "children": [
+                {
+                    "path": "lazyload",
+                    "name": "testLazyload",
+                    "meta": {}
+                }
+            ]
         },
         {
             "path": "/error",

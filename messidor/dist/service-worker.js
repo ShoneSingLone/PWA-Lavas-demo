@@ -17,10 +17,10 @@ const workboxSW = new WorkboxSW({
 workboxSW.precache([
   {
     "url": "/index.html",
-    "revision": "18f3f4874236aff512659e092badd065"
+    "revision": "805cf6ac62dd4cda786d3e4d113a8f3d"
   },
   {
-    "url": "/static/css/index.42b6e1be.css"
+    "url": "/static/css/index.b581ed26.css"
   },
   {
     "url": "/static/fonts/MaterialIcons-Regular.012cf6a1.woff"
@@ -29,16 +29,25 @@ workboxSW.precache([
     "url": "/static/fonts/MaterialIcons-Regular.a37b0c01.ttf"
   },
   {
-    "url": "/static/js/index.00232437.js"
+    "url": "/static/js/0.77ba67d1.js"
   },
   {
-    "url": "/static/js/manifest.7253881e.js"
+    "url": "/static/js/1.ca373c1a.js"
   },
   {
-    "url": "/static/js/vendor.e410d344.js"
+    "url": "/static/js/2.1cbd2501.js"
   },
   {
-    "url": "/static/js/vue.353db202.js"
+    "url": "/static/js/index.d19bcd32.js"
+  },
+  {
+    "url": "/static/js/manifest.e2a1d9f2.js"
+  },
+  {
+    "url": "/static/js/vendor.ec299696.js"
+  },
+  {
+    "url": "/static/js/vue.f62a68f9.js"
   },
   {
     "url": "/static/js/workbox-sw.prod.v2.1.3.js",
@@ -48,11 +57,15 @@ workboxSW.precache([
 workboxSW.router.registerNavigationRoute('/index.html');
 
 
+// Define runtime cache.
+workboxSW.router.registerRoute(new RegExp('https://query\.yahooapis\.com/v1/public/yql'),
+    workboxSW.strategies.networkFirst());
+
 /**
  * example runningCache with api
  */
-// workboxSW.router.registerRoute(/^https:\/\/lavas\.baidu\.com\/some\/api/,
-//     workboxSW.strategies.networkFirst());
+workboxSW.router.registerRoute(/^https:\/\/lavas\.baidu\.com\/some\/api/,
+    workboxSW.strategies.networkFirst());
 
 
 /**
@@ -60,15 +73,15 @@ workboxSW.router.registerNavigationRoute('/index.html');
  * including maxAge, maxEntries
  * cacheableResponse is important for CDN
  */
-// workboxSW.router.registerRoute(/^https:\/\/cdn\.baidu\.com/i,
-//     workboxSW.strategies.cacheFirst({
-//         cacheName: 'lavas-cache-images',
-//         cacheExpiration: {
-//             maxEntries: 100,
-//             maxAgeSeconds: 7 * 24 * 60 * 60
-//         },
-//         cacheableResponse: {
-//             statuses: [0, 200]
-//         }
-//     })
-// );
+workboxSW.router.registerRoute(/^https:\/\/cdn\.baidu\.com/i,
+    workboxSW.strategies.cacheFirst({
+        cacheName: 'lavas-cache-images',
+        cacheExpiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 7 * 24 * 60 * 60
+        },
+        cacheableResponse: {
+            statuses: [0, 200]
+        }
+    })
+);
