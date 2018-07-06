@@ -6,7 +6,7 @@
 'use strict';
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const path = require('path');
-const BUILD_PATH = path.resolve(__dirname, 'final');
+const BUILD_PATH = path.resolve(__dirname, 'dist');
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -14,7 +14,7 @@ module.exports = {
     build: {
         ssr: false,
         path: BUILD_PATH,
-        publicPath: "../../",
+        publicPath: "/",
         ssrCopy: isDev ? [] : [{
                 src: 'server.prod.js'
             },
