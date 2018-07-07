@@ -12,7 +12,7 @@ export default function ({
     // 通过 route.path 判断路由
     if (!isLogin && route.path !== '/login') {
         return redirect({
-            path: '/login'
+            // path: '/login'
         });
     }
 }

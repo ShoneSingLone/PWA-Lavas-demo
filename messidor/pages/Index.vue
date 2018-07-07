@@ -1,19 +1,46 @@
 <template>
-  <div>
-    <div class="content">
-      <div>
-        <!--         <h1>HeHe</h1>
-        <h2>LAVAS</h2>
-        <h4>[ˈlɑ:vəz]</h4>
- -->
-        <ul v-if="list.length>0">
-          <li v-for="(item, index) in list" :key="id">
-            {{item}}asdfasdf
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+  <v-app light>
+    <v-content>
+      <v-container>
+        <v-layout row wrap align-center>
+          <v-flex xs12 md6 offset-md3>
+            <div v-for="post in blogList" :key="post.title">
+              <v-card class="my-3" hover>
+                <v-card-media class="white--text" height="170px" :src="post.imgUrl">
+                  <v-container fill-height fluid>
+                    <v-layout>
+                      <v-flex xs12 align-end d-flex>
+                        <span class="headline">{{ post.title }}</span>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-media>
+                <v-card-text>
+                  {{ post.body }}
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn flat class="blue--text">Read More</v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
+    <v-footer class="secondary" app>
+      <v-layout row wrap align-center>
+        <v-flex xs12>
+          <div class="white--text ml-3">
+            Made with
+            <v-icon class="red--text">favorite</v-icon>
+            by
+            <a class="white--text" href="https://vuetifyjs.com" target="_blank">Vuetify</a>
+          </div>
+        </v-flex>
+      </v-layout>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
@@ -34,20 +61,43 @@ function setState(store) {
       }
     ]
   });
+  // 从IndexDB取出数据，setBlogList，同时不管有没有都会后台触发从仓库查询，对现有数据进行更新，后续添加更新提醒
+  store.dispatch("blog/setBlog");
 }
 
 export default {
   name: "index",
-  data: function() {
+  data() {
     return {
-      list: []
+      title: "Your Logo",
+      posts: [
+        {
+          title: "Fusce ullamcorper tellus",
+          content:
+            "Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna.",
+          imgUrl:
+            "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg"
+        },
+        {
+          title: "Donec vitae suscipit lectus, a luctus diam.",
+          content:
+            "Donec vitae suscipit lectus, a luctus diam. Proin vitae felis gravida, lobortis massa sit amet, efficitur erat. Morbi vel ultrices nisi."
+        },
+        {
+          title: "Vestibulum condimentum quam",
+          content:
+            "At sagittis sapien vulputate. Vivamus laoreet lacus id magna rutrum dapibus. Donec vel pellentesque arcu. Maecenas mollis odio tempus felis elementum commodo.",
+          imgUrl:
+            "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/plane.jpg"
+        }
+      ]
     };
   },
   metaInfo: {
     title: "News",
     titleTemplate: "%s",
     meta: [
-      { name: "keywords", content: "lavas PWA" },
+      { name: "keywords", content: "FrontEnd News" },
       {
         name: "description",
         content:
@@ -55,12 +105,17 @@ export default {
       }
     ]
   },
-  async asyncData({ store, route }) {
-    let result = await axios(``);
-    // console.log((this.list = result.data));
-    this.list = result.data;
-    console.log(this.list.length);
+  created() {
     // debugger;
+    console.log(this.blogList);
+  },
+  computed: {
+    blogList: function() {
+      debugger;
+      return this.$store.getters["blog/list"];
+    }
+  },
+  async asyncData({ store, route }) {
     setState(store);
   },
   activated() {

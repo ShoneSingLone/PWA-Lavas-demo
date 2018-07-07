@@ -75,7 +75,9 @@ export const actions = {
      * @param {Function} commit commit
      * @param {Object} appHeader appHeader
      */
-    setAppHeader({commit}, appHeader) {
+    setAppHeader({
+        commit
+    }, appHeader) {
         commit(SET_APP_HEADER, appHeader);
     }
 };

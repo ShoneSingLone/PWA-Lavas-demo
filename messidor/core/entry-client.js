@@ -4,13 +4,21 @@
  */
 
 import Vue from 'vue';
-import {getMiddlewares, execSeries, getClientContext} from '@/.lavas/middleware';
+import {
+    getMiddlewares,
+    execSeries,
+    getClientContext
+} from '@/.lavas/middleware';
 import lavasConfig from '@/.lavas/config';
-import {createApp} from './app';
+import {
+    createApp
+} from './app';
 import ProgressBar from '@/components/ProgressBar';
 import arrayFindShim from 'array.prototype.find';
 import arrayIncludesShim from 'array-includes';
-import {stringify} from 'querystring';
+import {
+    stringify
+} from 'querystring';
 
 import 'es6-promise/auto';
 import '@/assets/stylus/main.styl';
@@ -20,8 +28,22 @@ arrayFindShim.shim();
 arrayIncludesShim.shim();
 
 let loading = Vue.prototype.$loading = new Vue(ProgressBar).$mount();
-let {App, router, store} = createApp();
-let {build: {ssr, cssExtract}, middleware: middConf = {}, skeleton: {enable: enableSkeleton, asyncCSS}} = lavasConfig;
+let {
+    App,
+    router,
+    store
+} = createApp();
+let {
+    build: {
+        ssr,
+        cssExtract
+    },
+    middleware: middConf = {},
+    skeleton: {
+        enable: enableSkeleton,
+        asyncCSS
+    }
+} = lavasConfig;
 let app;
 
 // Sync with server side state.
@@ -59,8 +81,7 @@ Vue.mixin({
                 loading.finish();
                 next();
             }).catch(next);
-        }
-        else {
+        } else {
             next();
         }
     }
@@ -91,8 +112,7 @@ if (!usingAppshell && ssr) {
         handleAsyncData();
         app.$mount('#app');
     });
-}
-else {
+} else {
     /**
      * Use async CSS in SPA to render skeleton faster.
      * https://github.com/lavas-project/lavas/issues/73
@@ -114,11 +134,12 @@ else {
 
     // Fetch data in client side.
     handleAsyncData();
+    // debugger;
     app = new App();
 
     // if style is ready, start mounting immediately
-    if (ssr || !enableAsyncCSS
-        || (enableAsyncCSS && window.STYLE_READY)) {
+    if (ssr || !enableAsyncCSS ||
+        (enableAsyncCSS && window.STYLE_READY)) {
         window.mountLavas();
     }
 }
@@ -138,8 +159,12 @@ function handleMiddlewares() {
             ...(middConf.all || []),
             ...(middConf.client || []),
             ...matchedComponents
-                .filter(({middleware}) => !!middleware)
-                .reduce((arr, {middleware}) => arr.concat(middleware), [])
+            .filter(({
+                middleware
+            }) => !!middleware)
+            .reduce((arr, {
+                middleware
+            }) => arr.concat(middleware), [])
         ];
 
         // get all the middlewares defined by user
@@ -205,22 +230,25 @@ function handleAsyncData() {
         loading.start();
 
         Promise.all(
-            activated
-             /**
-              * asyncData gets called in two conditions:
-              * 1. non keep-alive component everytime
-              * 2. keep-alive component only at first time(detected by asyncDataFetched flag)
-              */
-            .filter(c => c.asyncData && (!c.asyncDataFetched || !to.meta.keepAlive))
-            .map(async c => {
-                await c.asyncData({store, route: to});
-                c.asyncDataFetched = true;
+                activated
+                /**
+                 * asyncData gets called in two conditions:
+                 * 1. non keep-alive component everytime
+                 * 2. keep-alive component only at first time(detected by asyncDataFetched flag)
+                 */
+                .filter(c => c.asyncData && (!c.asyncDataFetched || !to.meta.keepAlive))
+                .map(async c => {
+                    await c.asyncData({
+                        store,
+                        route: to
+                    });
+                    c.asyncDataFetched = true;
+                })
+            )
+            .then(() => {
+                loading.finish();
+                next();
             })
-        )
-        .then(() => {
-            loading.finish();
-            next();
-        })
-        .catch(next);
+            .catch(next);
     });
 }

@@ -18,7 +18,9 @@ import {
     VApp,
     VBtn,
     VIcon,
-    VGrid //{ VContainer, VContent, VFlex, VLayout, VSpacer }
+    VGrid, //{ VContainer, VContent, VFlex, VLayout, VSpacer }
+    VCard,
+    VFooter
 } from 'vuetify';
 // import Vuetify from 'vuetify';
 
@@ -31,7 +33,9 @@ Vue.use(Vuetify, {
         VApp,
         VBtn,
         VIcon,
-        ...VGrid
+        ...VGrid,
+        VCard,
+        VFooter
     }
 });
 
