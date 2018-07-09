@@ -2,8 +2,8 @@
   <div class="detail-wrapper">
     <v-layout row wrap>
       <v-flex xs10 offset-xs1>
-        <article class="detail-content text-xs-center" v-if="article">
-          <div v-html="article.content"></div>
+        <article class="detail-content text-xs-center" v-if="blogDetail">
+          <div v-html="blogDetail.content"></div>
         </article>
       </v-flex>
     </v-layout>
@@ -14,18 +14,20 @@
 import axios from "axios";
 import { mapState, mapActions } from "vuex";
 
+let blogDetail = { title: "detail", desc: "desc" };
+
+function setState(store, state) {
+  store.dispatch("appShell/appHeader/setAppHeader", state);
+}
+
 export default {
   name: "detailId",
   metaInfo() {
-    this.article = this.$route.params.blog;
-    if (!this.article) {
-      this.article = this.$store.getters["blog/article"](this.$route.params.id);
-    }
     return {
-      title: this.article.title,
+      title: blogDetail.title,
       titleTemplate: "%s-正文",
       meta: [
-        { name: "keywords", content: this.article.desc },
+        { name: "keywords", content: blogDetail.desc },
         {
           name: "description",
           content:
@@ -36,43 +38,43 @@ export default {
   },
   data() {
     return {
-      article: "",
-      state: {
-        appHeaderState: {
-          show: true,
-          title: "detail",
-          showMenu: true,
-          showBack: true,
-          showLogo: true,
-          actions: [
-            {
-              icon: "home",
-              route: {
-                name: "index"
-              }
-            }
-          ]
-        }
-      }
+      blogDetail
     };
   },
   methods: {
     ...mapActions("appShell/appHeader", ["setAppHeader"])
   },
   async asyncData({ store, route }) {
-    // await store.dispatch("detail/setWeather", { woeid: 2151849 });
+    blogDetail = await window.myDB.retrieve("blog", route.params.id);
+    setState(store, {
+      show: true,
+      title: blogDetail.title,
+      showMenu: false,
+      showBack: true,
+      showLogo: true,
+      actions: [
+        {
+          icon: "home",
+          route: {
+            name: "index"
+          }
+        }
+      ]
+    });
+
+    console.log("_id.vue-asyncData");
   },
   computed: {},
   created() {
+    console.log("_id.vue-created");
     console.dir(this);
-    this.setAppHeader(this.state.appHeaderState);
   },
   activated() {
-    debugge;
+    console.log("_id.vue-activated");
     this.setAppHeader(this.state.appHeaderState);
   },
   deactivated() {
-    debugge;
+    console.log("_id.vue-deactivated");
     this.setAppHeader(this.state.appHeaderState);
   }
 };

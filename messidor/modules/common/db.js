@@ -23,7 +23,7 @@ function isIndexedDBOK() {
 MyDB.prototype.create = function (table, value) {
     let self = this;
     return new Promise((resolve, reject) => {
-        console.log((create));
+        console.log(("create"));
         //获取事务
         //默认为全部对象存储，事务类型为read
         let transaction = self.db.transaction([table], "readwrite");
@@ -42,12 +42,31 @@ MyDB.prototype.create = function (table, value) {
         }
     })
 }
-
-MyDB.prototype.retrieve = function () {}
+/**
+ * 
+ * @param {*} table 
+ * @param {*} key 
+ */
+MyDB.prototype.retrieve = function (table, key) {
+    let self = this;
+    return new Promise((resolve, reject) => {
+        let transaction = self.db.transaction([table], "readonly");
+        let store = transaction.objectStore(table);
+        let request = store.get(key);
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            resolve(result);
+        }
+        request.onerror = function (e) {
+            console.log("Error");
+            reject(e);
+        }
+    })
+}
 
 /**
  * 
- * @param {*} tables 
+ * @param {*} table
  * @param {*} value 
  */
 
@@ -78,15 +97,15 @@ MyDB.prototype.update = function (table, value) {
 MyDB.prototype.delete = function () {}
 /**
  * 
- * @param {*} tables 数组...
+ * @param {*} tableName 将查之表之名
  */
-MyDB.prototype.getAll = function (tables) {
+MyDB.prototype.getAll = function (tableName) {
     let self = this;
     return new Promise((resolve, reject) => {
         try {
             let contents = [];
-            let transaction = self.db.transaction(tables, "readonly");
-            let table = transaction.objectStore(tables[0]);
+            let transaction = self.db.transaction([tableName], "readonly");
+            let table = transaction.objectStore(tableName);
             let cursor = table.openCursor();
             cursor.onsuccess = function (e) {
                 let cursor = e.target.result;
@@ -116,13 +135,13 @@ MyDB.prototype.openDB = function () {
         }
 
         openRequest.onsuccess = function (e) {
-            console.log("running onsuccess");
+            console.log("openDB　onsuccess");
             resolve(self.db = e.target.result);
 
         }
         openRequest.onerror = function (error) {
             debugger;
-            console.log("openRequest.onerror");
+            console.log("openDB　onerror");
             reject(error);
         }
     });

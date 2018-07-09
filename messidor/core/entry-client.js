@@ -212,9 +212,15 @@ if (!usingAppshell && ssr) {
                         }
                         //以上完成本地IndexedDB的检测与设置，则可设置indexedDB的state
                         app.$store.commit("common/setDBState", true);
+                        // app.$store.commit("common/setDB", myDB);
+
+                        // 成为一个单例
+                        window.myDB = myDB;
+
                         if (!isFirst) {
                             app.$mount('#app');
                         }
+
                         let contents = await Axios("https://api.github.com/repos/FreeCodeCamp-Chengdu/IT-Technology-weekly/issues");
 
                         if (contents && contents.data) {
@@ -227,7 +233,7 @@ if (!usingAppshell && ssr) {
                                 // html = jquery(content).html(),
                                 text = jquery(content).text(),
                                 desc = text.length > 120 ? text.substring(0, 120) + "..." : text;
-                            myDB[method](["blog"], {
+                            myDB[method]("blog", {
                                 imgUrl: "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/docks.jpg",
                                 desc,
                                 content,

@@ -4,7 +4,7 @@
       <v-container>
         <v-layout row wrap align-center>
           <v-flex xs12 md6 offset-md3>
-            <div v-for="blog in blogList" :key="blog.title">
+            <div v-for="blog in blogList" :key="blog.id">
               <v-card class="my-3" hover>
                 <v-card-media class="white--text" height="170px" :src="blog.imgUrl">
                   <v-container fill-height fluid>
@@ -24,6 +24,27 @@
                 </v-card-actions>
               </v-card>
             </div>
+            <!--             <div v-for="blog in testposts" :key="blog.id">
+              <v-card class="my-3" hover>
+                <v-card-media class="white--text" height="170px" :src="blog.imgUrl">
+                  <v-container fill-height fluid>
+                    <v-layout>
+                      <v-flex xs12 align-end d-flex>
+                        <span class="headline">{{ blog.title }}</span>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-card-media>
+                <v-card-text>
+                  {{ blog.desc }}
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn flat class="blue--text" @click="readMore(blog.id)">Read More</v-btn>
+                </v-card-actions>
+              </v-card>
+            </div>
+ -->
           </v-flex>
         </v-layout>
       </v-container>
@@ -44,7 +65,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import axios from "axios";
 
 function setState(store) {
@@ -67,28 +88,30 @@ export default {
   name: "index",
   data() {
     return {
+      db: window.myDB,
       title: "Your Logo",
-      posts: [
-        {
-          title: "Fusce ullamcorper tellus",
-          content:
-            "Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna.",
-          imgUrl:
-            "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg"
-        },
-        {
-          title: "Donec vitae suscipit lectus, a luctus diam.",
-          content:
-            "Donec vitae suscipit lectus, a luctus diam. Proin vitae felis gravida, lobortis massa sit amet, efficitur erat. Morbi vel ultrices nisi."
-        },
-        {
-          title: "Vestibulum condimentum quam",
-          content:
-            "At sagittis sapien vulputate. Vivamus laoreet lacus id magna rutrum dapibus. Donec vel pellentesque arcu. Maecenas mollis odio tempus felis elementum commodo.",
-          imgUrl:
-            "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/plane.jpg"
-        }
-      ]
+      // testposts: [
+      //   {
+      //     title: "Fusce ullamcorper tellus",
+      //     content:
+      //       "Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna.",
+      //     imgUrl:
+      //       "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg"
+      //   },
+      //   {
+      //     title: "Donec vitae suscipit lectus, a luctus diam.",
+      //     content:
+      //       "Donec vitae suscipit lectus, a luctus diam. Proin vitae felis gravida, lobortis massa sit amet, efficitur erat. Morbi vel ultrices nisi."
+      //   },
+      //   {
+      //     title: "Vestibulum condimentum quam",
+      //     content:
+      //       "At sagittis sapien vulputate. Vivamus laoreet lacus id magna rutrum dapibus. Donec vel pellentesque arcu. Maecenas mollis odio tempus felis elementum commodo.",
+      //     imgUrl:
+      //       "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/plane.jpg"
+      //   }
+      // ],
+      blogList: []
     };
   },
   metaInfo: {
@@ -104,31 +127,25 @@ export default {
     ]
   },
   created() {
-    // debugger;
-    console.log(this.blogList);
+    (async function(self) {
+      self.blogList = await self.db.getAll("blog");
+    })(this);
   },
   methods: {
     readMore(id) {
       this.$router.push({ name: "detailId", params: { id } });
     }
   },
-  computed: {
-    blogList: function() {
-      return this.$store.getters["blog/list"];
-    }
-  },
+  mounted() {},
+  computed: {},
   async asyncData({ store, route }) {
     setState(store);
   },
   activated() {
-    debugger;
-    console.log(this.$store);
-    setState(this.$store);
+    // setState(this.$store);
   },
   deactivated() {
-    console.log(this.$store);
-    debugger;
-    setState(this.$store);
+    // setState(this.$store);
   }
 };
 </script>

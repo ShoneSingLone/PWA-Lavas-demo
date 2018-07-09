@@ -1,5 +1,9 @@
+import MyDB from "../modules/common/db";
+
+
 const SET_LOGIN = 'setLogin',
-    SET_DBSTATE = 'setDBState' //;
+    SET_DBSTATE = 'setDBState', //;
+    SET_DB = 'setDB' //;
 
 export const state = () => {
     return {
@@ -15,9 +19,16 @@ export const state = () => {
          *
          * @type {boolean}
          */
-        isDB_OK: false
+        isDB_OK: false,
+        /**
+         * IndexedDB 封装
+         * 打开的实例
+         * @type {MyDB}
+         */
+        db: new MyDB()
     };
 };
+
 
 export const getters = {
     login: state => {
@@ -25,7 +36,10 @@ export const getters = {
     },
     isDB_OK: state => {
         return state.isDB_OK;
-    }
+    },
+    db: state => {
+        return state.db;
+    },
 };
 
 export const mutations = {
@@ -33,7 +47,10 @@ export const mutations = {
         state.login = isLogin;
     },
     [SET_DBSTATE](state, isOK) {
-        state.login = isOK;
+        state.isDB_OK = isOK;
+    },
+    [SET_DB](state, db) {
+        state.db = db;
     }
 };
 

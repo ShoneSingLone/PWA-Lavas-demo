@@ -23,14 +23,11 @@ export const getters = {
         return state.hasBlog;
     },
     list: state => {
-        return state.list
+        return state.list;
     },
     article: (state) => (id) => {
         let result;
-        if (!(state.list && state.list.length > 0)) {
-
-
-        }
+        if (!(state.list && state.list.length > 0)) {}
         result = state.list.find(blog => id === blog.id);
         return result;
     }
