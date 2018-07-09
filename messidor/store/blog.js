@@ -1,7 +1,60 @@
 // import Lockr from 'lockr';
 // import Dexie from 'dexie';
 import Axios from 'axios';
-import MyDB from "../modules/common/db";
+import Marked from 'marked';
+import Highlight from 'highlight.js';
+import jquery from 'jquery';
+// let jquery = window.jquery;
+
+let renderer = new Marked.Renderer();
+renderer.headerIdPrefix = 0;
+renderer.heading = function (text, level, raw) {
+    return '<h' + level + ' id="' + (this.headerIdPrefix++) + this.options.headerPrefix + raw.toLowerCase().replace(/[^\w]+/g, '-') + '" class="content">' +
+        text +
+        '</h' + level + '>\n';
+}
+renderer.link = function (href, title, text) {
+    if (this.options.sanitize) {
+        try {
+            var prot = decodeURIComponent(unescape(href))
+                .replace(/[^\w:]/g, '')
+                .toLowerCase();
+        } catch (e) {
+            return text;
+        }
+        if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0 || prot.indexOf('data:') === 0) {
+            return text;
+        }
+    }
+    if (this.options.baseUrl && !originIndependentUrl.test(href)) {
+        href = resolveUrl(this.options.baseUrl, href);
+    }
+    var out = '<a target="_blank" href="' + href + '"';
+    if (title) {
+        out += ' title="' + title + '"';
+    }
+    out += '>' + text + '</a>';
+    return out;
+};
+
+
+Marked.setOptions({
+    renderer,
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+    highlight: function (code) {
+        code = Highlight.highlightAuto(code).value;
+        return code;
+    }
+});
+
+
+
 
 const SET_BLOG = 'setBlog';
 const GET_BLOG = 'getBlog';
@@ -23,6 +76,15 @@ export const getters = {
     },
     list: state => {
         return state.list
+    },
+    article: (state) => (id) => {
+        let result;
+        if (!(state.list && state.list.length > 0)) {
+
+
+        }
+        result = state.list.find(blog => id === blog.id);
+        return result;
     }
 };
 
@@ -36,85 +98,31 @@ export const mutations = {
 
 
 
-function getBlogFromRemote() {
-    return new Promise((resolve, reject) => {
-        // 更新数据
-        Axios(
-            "https://api.github.com/repos/FreeCodeCamp-Chengdu/IT-Technology-weekly/issues"
-        ).then(result => {
-            console.timeEnd("blog/SET_BLOG");
-            if (result && result.data) {
-                resolve(result.data);
-            } else {
-                throw new Error(result);
-            }
-        }).catch(error => {
-            reject(error);
-        });
 
-    })
-}
-
-function getBlogFromIndexedDB() {
-    return new Promise((resolve, reject) => {
-        try {
-            let blogs = [];
-            console.log("getBlogFromIndexedDB")
-            // 检查indexedDB是否可用 
-            if (isIndexedDBOK()) {
-                // 可用就直接已存储结果
-                let mainDB;
-                let myDB = new MyDB("news", 1);
-                myDB.openDB()
-                    .then(db => {
-                        mainDB = db;
-                        if (mainDB.objectStoreNames.contains("blog")) {
-                            // 已存在则直接获取
-                            resolve(myDB.getAll(["blog"]));
-                        } else {
-                            //新建表，并且第一次访问则肯定需要从仓库获取数据
-                            let blogOStore = mainDB.createObjectStore("blog", {
-                                "keyPath": "id"
-                            });
-                            // 索引
-                            blogOStore.createIndex("id", "id", {
-                                unique: true
-                            });
-                            blogOStore.createIndex("updated_at", "updated_at", {
-                                unique: false
-                            });
-                        }
-                    }).catch(error => {
-                        console.log(error);
-                    })
-            } else {
-                /* 
-                                // 不可用就拉取信息
-                                getBlogFromRemote().then(contents => {
-                                    resolve(contents);
-                                })
-                             */
-            };
-            // 如果没有就需要直接将获取的内容返回
-        } catch (error) {
-            reject(error);
-        }
-    })
-}
 /**
  * 将收到的数据处理成符合要求的结构 
  * 
- * @param {any} db  MyDB
+ * @param {any} myDB  MyDB
  * @param {any} contents 
  */
-function whateverToData(db, contents) {
+function updateIndexedDBData(myDB, table, contents, isfirst) {
+    console.log("window.jquery", window.jquery);
+
     contents.forEach((value, index, array) => {
-        db.update(["blog"], {
+        let method = isfirst ? "create" : "update",
+            content = Marked(value.body),
+            // html = jquery(content).html(),
+            text = jquery(content).text(),
+            desc = text.length > 120 ? text.substring(0, 120) + "..." : text;
+        myDB[method]([table], {
             imgUrl: "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/docks.jpg",
+            desc,
+            content,
             ...value
         });
     });
 }
+
 /**
  * 
  * 
@@ -135,20 +143,46 @@ export const actions = {
         commit
     }) {
         console.time("blog/SET_BLOG");
-        // 从IndexedDB中取出数据
-        getBlogFromIndexedDB().then(localDAta => {
-            commit(SET_BLOG, localDAta);
-        });
-        //无论如何都要更新
-        /* 
-         getBlogFromRemote().then(contents => {
-             console.log(contents);
-             contents = whateverToData(myDB, contents);
-             resolve(contents);
-         }).catch(error => {
-             console.log(error);
-         });
-          */
+
+        let blogs = [];
+        // 检查indexedDB是否可用 
+        if (isIndexedDBOK()) {
+            // 可用就直接已存储结果
+            let myDB = new MyDB("news", 1);
+            myDB.openDB()
+                .then(db => {
+                    if (db.objectStoreNames.contains("blog")) {
+                        // 从IndexedDB中取出数据
+                        myDB.getAll(["blog"])
+                            .then(localDAta => {
+                                commit(SET_BLOG, localDAta);
+                            });
+                    } else {
+                        //新建表，并且第一次访问则肯定需要从仓库获取数据
+                        let blogOStore = db.createObjectStore("blog", {
+                            "keyPath": "id"
+                        });
+                        // 索引
+                        blogOStore.createIndex("id", "id", {
+                            unique: true
+                        });
+                        blogOStore.createIndex("updated_at", "updated_at", {
+                            unique: false
+                        });
+                    }
+                    return getBlogFromRemote();
+                }).then(contents => {
+                    //无论如何都要更新
+                    updateIndexedDBData(myDB, "blog", contents);
+                    myDB.getAll(["blog"])
+                        .then(localDAta => {
+                            commit(SET_BLOG, localDAta);
+                        });
+
+                }).catch(error => {
+                    console.log(error);
+                });
+        }
     },
     // 该方法主要供服务端接口验证使用
     async validLogin({

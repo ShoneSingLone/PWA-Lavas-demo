@@ -1,4 +1,5 @@
-const SET_LOGIN = 'setLogin';
+const SET_LOGIN = 'setLogin',
+    SET_DBSTATE = 'setDBState' //;
 
 export const state = () => {
     return {
@@ -8,18 +9,31 @@ export const state = () => {
          * @type {boolean}
          */
         login: false,
+        /**
+         * IndexedDB可用状态
+         * 表示可以订阅相关的状态
+         *
+         * @type {boolean}
+         */
+        isDB_OK: false
     };
 };
 
 export const getters = {
     login: state => {
         return state.login;
+    },
+    isDB_OK: state => {
+        return state.isDB_OK;
     }
 };
 
 export const mutations = {
     [SET_LOGIN](state, isLogin) {
         state.login = isLogin;
+    },
+    [SET_DBSTATE](state, isOK) {
+        state.login = isOK;
     }
 };
 

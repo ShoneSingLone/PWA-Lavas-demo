@@ -2,66 +2,30 @@
   <div class="detail-wrapper">
     <v-layout row wrap>
       <v-flex xs10 offset-xs1>
-        <article class="detail-content text-xs-center">
-          <header class="detail-title text-xs-center">
-            Detail {{$route.params.id}}
-          </header>
-          <a @click="routerClick"> Detail {{Number($route.params.id) + 1}} </a>
-          <p>
-            Progressive Web Apps are user experiences that have the reach of the web, and are: Reliable - Load instantly and never show the downasaur, even in uncertain network conditions. Fast - Respond quickly to user interactions with silky smooth animations and no janky scrolling.
-          </p>
-          <p>
-            Progressive Web Apps are user experiences that have the reach of the web, and are: Reliable - Load instantly and never show the downasaur, even in uncertain network conditions. Fast - Respond quickly to user interactions with silky smooth animations and no janky scrolling.
-          </p>
-          <p>
-            Progressive Web Apps are user experiences that have the reach of the web, and are: Reliable - Load instantly and never show the downasaur, even in uncertain network conditions. Fast - Respond quickly to user interactions with silky smooth animations and no janky scrolling.
-          </p>
-          <p>
-            Progressive Web Apps are user experiences that have the reach of the web, and are: Reliable - Load instantly and never show the downasaur, even in uncertain network conditions. Fast - Respond quickly to user interactions with silky smooth animations and no janky scrolling.
-          </p>
-          <p>
-            Progressive Web Apps are user experiences that have the reach of the web, and are: Reliable - Load instantly and never show the downasaur, even in uncertain network conditions. Fast - Respond quickly to user interactions with silky smooth animations and no janky scrolling.
-          </p>
+        <article class="detail-content text-xs-center" v-if="article">
+          <div v-html="article.content"></div>
         </article>
       </v-flex>
-    </v-layout
->  </div>
+    </v-layout>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
-import mapState from "vuex";
-
-let state = {
-  appHeaderState: {
-    show: true,
-    title: "Lavas",
-    showMenu: true,
-    showBack: true,
-    showLogo: true,
-    actions: [
-      {
-        icon: "home",
-        route: {
-          name: "index"
-        }
-      }
-    ]
-  }
-};
-
-function setState(store) {
-  store.dispatch("appShell/appHeader/setAppHeader", state.appHeaderState);
-}
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "detailId",
   metaInfo() {
+    this.article = this.$route.params.blog;
+    if (!this.article) {
+      this.article = this.$store.getters["blog/article"](this.$route.params.id);
+    }
     return {
-      title: `Detail ${this.$route.params.id}`,
-      titleTemplate: "%s - Lavas",
+      title: this.article.title,
+      titleTemplate: "%s-正文",
       meta: [
-        { name: "keywords", content: "lavas PWA" },
+        { name: "keywords", content: this.article.desc },
         {
           name: "description",
           content:
@@ -70,39 +34,46 @@ export default {
       ]
     };
   },
+  data() {
+    return {
+      article: "",
+      state: {
+        appHeaderState: {
+          show: true,
+          title: "detail",
+          showMenu: true,
+          showBack: true,
+          showLogo: true,
+          actions: [
+            {
+              icon: "home",
+              route: {
+                name: "index"
+              }
+            }
+          ]
+        }
+      }
+    };
+  },
   methods: {
-    routerClick() {
-      let id = this.$route.params.id;
-      id = Number(id) + 1;
-      console.log("this.$route.params.id", id);
-      console.log(this.$route);
-      this.$router.push({ name: "detailId", params: { id } });
-    }
+    ...mapActions("appShell/appHeader", ["setAppHeader"])
   },
   async asyncData({ store, route }) {
-    console.log(
-      'store.getters["detail/weather"]',
-      store.getters["detail/weather"]
-    );
-    await store.dispatch("detail/setWeather", { woeid: 2151849 });
+    // await store.dispatch("detail/setWeather", { woeid: 2151849 });
   },
-  computed: {
-    weather() {
-      debugger;
-      console.log("fasdfasdf", this.$store.getters["detail/weather"]);
-      return this.$store.getters["detail/weather"];
-    }
+  computed: {},
+  created() {
+    console.dir(this);
+    this.setAppHeader(this.state.appHeaderState);
   },
-  // created() {
-  //   console.dir(this);
-  //   debugger;
-  //   console.log(
-  //     `Weather of Shanghai: ${this.weather.text}, ${this.weather.temp}°F`
-  //   );
-  // },
   activated() {
-    debugger;
-    setState(this.$store);
+    debugge;
+    this.setAppHeader(this.state.appHeaderState);
+  },
+  deactivated() {
+    debugge;
+    this.setAppHeader(this.state.appHeaderState);
   }
 };
 </script>

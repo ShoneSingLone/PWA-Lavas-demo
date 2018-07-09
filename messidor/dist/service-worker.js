@@ -17,10 +17,10 @@ const workboxSW = new WorkboxSW({
 workboxSW.precache([
   {
     "url": "/index.html",
-    "revision": "034186e1b52d4985b730a6bf29076b88"
+    "revision": "652e7192e7fc66cd35e9021bbdf40648"
   },
   {
-    "url": "/static/css/index.92c7975b.css"
+    "url": "/static/css/index.ea5bdfde.css"
   },
   {
     "url": "/static/fonts/MaterialIcons-Regular.012cf6a1.woff"
@@ -38,13 +38,13 @@ workboxSW.precache([
     "url": "/static/js/2.f0e2d716.js"
   },
   {
-    "url": "/static/js/index.09b12693.js"
+    "url": "/static/js/index.28c113ab.js"
   },
   {
     "url": "/static/js/manifest.e4394036.js"
   },
   {
-    "url": "/static/js/vendor.c08aeb81.js"
+    "url": "/static/js/vendor.194de34c.js"
   },
   {
     "url": "/static/js/vue.f62a68f9.js"

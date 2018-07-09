@@ -23,6 +23,11 @@ export default {
 <style lang="stylus" scoped>
 @import '~normalize.css';
 
+.skeletion-div {
+    height: 12px;
+    background: linear-gradient(cyan, transparent), linear-gradient(225deg, magenta, transparent), linear-gradient(45deg, yellow, transparent);
+}
+
 .skeleton-wrapper {
     position: fixed;
     top: 0;

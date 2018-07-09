@@ -3,21 +3,32 @@ export default function MyDB(dbname, version) {
     this.dbname = dbname;
     this.version = version;
 }
+
+/**
+ * 
+ * 
+ * 
+ */
+
+function isIndexedDBOK() {
+    return ("indexedDB" in window);
+}
+
 /**
  * 
  * @param tables 默认是数组，以后可能会考虑多个表的操作
  * @param filed 
  * @param value 
  */
-MyDB.prototype.create = function (tables, value) {
+MyDB.prototype.create = function (table, value) {
     let self = this;
     return new Promise((resolve, reject) => {
-        console.log("About to add " + tables + "/" + value);
+        console.log((create));
         //获取事务
         //默认为全部对象存储，事务类型为read
-        let transaction = self.db.transaction([tables], "readwrite");
+        let transaction = self.db.transaction([table], "readwrite");
         //请求objectStore,!! 目前就是一个
-        let store = transaction.objectStore(tables[0]);
+        let store = transaction.objectStore(table);
         //添加数据
         let request = store.add(value);
         request.onerror = function (e) {
@@ -40,16 +51,16 @@ MyDB.prototype.retrieve = function () {}
  * @param {*} value 
  */
 
-MyDB.prototype.update = function (tables, value) {
+MyDB.prototype.update = function (table, value) {
     // put的时候如果带有keyPath就会更新，如果是add 已经存在的就会报错
     let self = this;
     return new Promise((resolve, reject) => {
-        console.log("About to update " + tables + "/" + value);
+        console.log("update");
         //获取事务
         //默认为全部对象存储，事务类型为read
-        let transaction = self.db.transaction([tables], "readwrite");
+        let transaction = self.db.transaction([table], "readwrite");
         //请求objectStore,!! 目前就是一个
-        let store = transaction.objectStore(tables[0]);
+        let store = transaction.objectStore(table);
         //添加数据
         let request = store.put(value);
         request.onerror = function (e) {
@@ -59,14 +70,16 @@ MyDB.prototype.update = function (tables, value) {
         }
         request.onsuccess = function (e) {
             resolve(e);
-            console.log("Woot! Did it");
         }
     })
 
 }
 
 MyDB.prototype.delete = function () {}
-
+/**
+ * 
+ * @param {*} tables 数组...
+ */
 MyDB.prototype.getAll = function (tables) {
     let self = this;
     return new Promise((resolve, reject) => {
@@ -99,11 +112,13 @@ MyDB.prototype.openDB = function () {
 
         openRequest.onupgradeneeded = function (e) {
             resolve(self.db = e.target.result);
+
         }
 
         openRequest.onsuccess = function (e) {
             console.log("running onsuccess");
             resolve(self.db = e.target.result);
+
         }
         openRequest.onerror = function (error) {
             debugger;

@@ -4,23 +4,23 @@
       <v-container>
         <v-layout row wrap align-center>
           <v-flex xs12 md6 offset-md3>
-            <div v-for="post in blogList" :key="post.title">
+            <div v-for="blog in blogList" :key="blog.title">
               <v-card class="my-3" hover>
-                <v-card-media class="white--text" height="170px" :src="post.imgUrl">
+                <v-card-media class="white--text" height="170px" :src="blog.imgUrl">
                   <v-container fill-height fluid>
                     <v-layout>
                       <v-flex xs12 align-end d-flex>
-                        <span class="headline">{{ post.title }}</span>
+                        <span class="headline">{{ blog.title }}</span>
                       </v-flex>
                     </v-layout>
                   </v-container>
                 </v-card-media>
                 <v-card-text>
-                  {{ post.body }}
+                  {{ blog.desc }}
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn flat class="blue--text">Read More</v-btn>
+                  <v-btn flat class="blue--text" @click="readMore(blog.id)">Read More</v-btn>
                 </v-card-actions>
               </v-card>
             </div>
@@ -50,7 +50,7 @@ import axios from "axios";
 function setState(store) {
   store.dispatch("appShell/appHeader/setAppHeader", {
     show: true,
-    title: "Lavas",
+    title: "News",
     showMenu: true,
     showBack: false,
     showLogo: false,
@@ -61,8 +61,6 @@ function setState(store) {
       }
     ]
   });
-  // 从IndexDB取出数据，setBlogList，同时不管有没有都会后台触发从仓库查询，对现有数据进行更新，后续添加更新提醒
-  store.dispatch("blog/setBlog");
 }
 
 export default {
@@ -109,9 +107,13 @@ export default {
     // debugger;
     console.log(this.blogList);
   },
+  methods: {
+    readMore(id) {
+      this.$router.push({ name: "detailId", params: { id } });
+    }
+  },
   computed: {
     blogList: function() {
-      debugger;
       return this.$store.getters["blog/list"];
     }
   },
@@ -119,6 +121,13 @@ export default {
     setState(store);
   },
   activated() {
+    debugger;
+    console.log(this.$store);
+    setState(this.$store);
+  },
+  deactivated() {
+    console.log(this.$store);
+    debugger;
     setState(this.$store);
   }
 };

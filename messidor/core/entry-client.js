@@ -23,6 +23,10 @@ import {
 import 'es6-promise/auto';
 import '@/assets/stylus/main.styl';
 
+// import initData from '../modules/init';
+import MyDB from "../modules/common/db";
+
+
 // Apply shim & polyfill.
 arrayFindShim.shim();
 arrayIncludesShim.shim();
@@ -60,8 +64,8 @@ if ('scrollRestoration' in window.history) {
 document.body.appendChild(loading.$el);
 
 Vue.mixin({
-
     /**
+     * 中继
      * Add an in-component guard which gets called
      * when component is reused in the new route.
      * eg. /detail/1 => /detail/2
@@ -121,26 +125,56 @@ if (!usingAppshell && ssr) {
      */
     let enableAsyncCSS = enableSkeleton && asyncCSS && cssExtract;
     window.mountLavas = () => {
+
         // https://huangxuan.me/2017/07/12/upgrading-eleme-to-pwa/#fast-skeleton-painting-with-settimeout-hack
         setTimeout(() => {
             let appRoot = document.querySelector('#app');
             if (appRoot) {
                 appRoot.innerHTML = '';
             }
-
+            // debugger;
             app.$mount('#app');
         }, 0);
     };
 
     // Fetch data in client side.
     handleAsyncData();
-    // debugger;
     app = new App();
+
 
     // if style is ready, start mounting immediately
     if (ssr || !enableAsyncCSS ||
         (enableAsyncCSS && window.STYLE_READY)) {
-        window.mountLavas();
+        (async () => {
+            //没有IndexedDB另说，暂时不管
+            if (window.indexedDB) {
+                try {
+                    //打开IndexedDB
+                    let myDB = new MyDB("news", 1);
+                    let db = await myDB.openDB();
+                    if (!db.objectStoreNames.contains("blog")) {
+                        //新建表，并且第一次访问则肯定需要从仓库获取数据
+                        let blogOStore = db.createObjectStore("blog", {
+                            "keyPath": "id"
+                        });
+                        // 索引
+                        blogOStore.createIndex("id", "id", {
+                            unique: true
+                        });
+                        blogOStore.createIndex("updated_at", "updated_at", {
+                            unique: false
+                        });
+                    }
+                    //以上完成本地IndexedDB的检测与设置，则可设置indexedDB的state
+                    debugger;
+                    app.$store.commit["setDBState"](true);
+                    let content = await myDB.getAll(["blog"]);
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        })()
     }
 }
 
