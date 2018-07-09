@@ -25,6 +25,61 @@ import '@/assets/stylus/main.styl';
 
 // import initData from '../modules/init';
 import MyDB from "../modules/common/db";
+import Axios from 'axios';
+import Marked from 'marked';
+import Highlight from 'highlight.js';
+import jquery from 'jquery';
+// let jquery = window.jquery;
+
+let renderer = new Marked.Renderer();
+renderer.headerIdPrefix = 0;
+renderer.heading = function (text, level, raw) {
+    return '<h' + level + ' id="' + (this.headerIdPrefix++) + this.options.headerPrefix + raw.toLowerCase().replace(/[^\w]+/g, '-') + '" class="content">' +
+        text +
+        '</h' + level + '>\n';
+}
+renderer.link = function (href, title, text) {
+    if (this.options.sanitize) {
+        try {
+            var prot = decodeURIComponent(unescape(href))
+                .replace(/[^\w:]/g, '')
+                .toLowerCase();
+        } catch (e) {
+            return text;
+        }
+        if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0 || prot.indexOf('data:') === 0) {
+            return text;
+        }
+    }
+    if (this.options.baseUrl && !originIndependentUrl.test(href)) {
+        href = resolveUrl(this.options.baseUrl, href);
+    }
+    var out = '<a target="_blank" href="' + href + '"';
+    if (title) {
+        out += ' title="' + title + '"';
+    }
+    out += '>' + text + '</a>';
+    return out;
+};
+
+
+Marked.setOptions({
+    renderer,
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+    highlight: function (code) {
+        code = Highlight.highlightAuto(code).value;
+        return code;
+    }
+});
+
+
+//以上是对现实的数据做初始化的一些配置。主要是Markdown的处理
 
 
 // Apply shim & polyfill.
@@ -133,8 +188,63 @@ if (!usingAppshell && ssr) {
                 appRoot.innerHTML = '';
             }
             // debugger;
-            app.$mount('#app');
-        }, 0);
+            (async () => {
+                //没有IndexedDB另说，暂时不管
+                if (window.indexedDB) {
+                    try {
+                        //打开IndexedDB
+                        let myDB = new MyDB("news", 1);
+                        let db = await myDB.openDB();
+                        let isFirst = false; //blog是否已经初始化数据
+                        if (!db.objectStoreNames.contains("blog")) {
+                            isFirst = true;
+                            //新建表，并且第一次访问则肯定需要从仓库获取数据
+                            let blogOStore = db.createObjectStore("blog", {
+                                "keyPath": "id"
+                            });
+                            // 索引
+                            blogOStore.createIndex("id", "id", {
+                                unique: true
+                            });
+                            blogOStore.createIndex("updated_at", "updated_at", {
+                                unique: false
+                            });
+                        }
+                        //以上完成本地IndexedDB的检测与设置，则可设置indexedDB的state
+                        app.$store.commit("common/setDBState", true);
+                        if (!isFirst) {
+                            app.$mount('#app');
+                        }
+                        let contents = await Axios("https://api.github.com/repos/FreeCodeCamp-Chengdu/IT-Technology-weekly/issues");
+
+                        if (contents && contents.data) {
+                            contents = contents.data;
+                        }
+
+                        contents.forEach((value, index, array) => {
+                            let method = isFirst ? "create" : "update",
+                                content = Marked(value.body),
+                                // html = jquery(content).html(),
+                                text = jquery(content).text(),
+                                desc = text.length > 120 ? text.substring(0, 120) + "..." : text;
+                            myDB[method](["blog"], {
+                                imgUrl: "https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/docks.jpg",
+                                desc,
+                                content,
+                                ...value
+                            });
+                        });
+                        if (isFirst) {
+                            app.$mount('#app');
+                        }
+                        // let contents = await myDB.getAll(["blog"]);
+                        // if (!(contents && contents.length > 0)) {}
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+            })();
+        }, 0 * 1000);
     };
 
     // Fetch data in client side.
@@ -145,36 +255,7 @@ if (!usingAppshell && ssr) {
     // if style is ready, start mounting immediately
     if (ssr || !enableAsyncCSS ||
         (enableAsyncCSS && window.STYLE_READY)) {
-        (async () => {
-            //没有IndexedDB另说，暂时不管
-            if (window.indexedDB) {
-                try {
-                    //打开IndexedDB
-                    let myDB = new MyDB("news", 1);
-                    let db = await myDB.openDB();
-                    if (!db.objectStoreNames.contains("blog")) {
-                        //新建表，并且第一次访问则肯定需要从仓库获取数据
-                        let blogOStore = db.createObjectStore("blog", {
-                            "keyPath": "id"
-                        });
-                        // 索引
-                        blogOStore.createIndex("id", "id", {
-                            unique: true
-                        });
-                        blogOStore.createIndex("updated_at", "updated_at", {
-                            unique: false
-                        });
-                    }
-                    //以上完成本地IndexedDB的检测与设置，则可设置indexedDB的state
-                    debugger;
-                    app.$store.commit["setDBState"](true);
-                    let content = await myDB.getAll(["blog"]);
-
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        })()
+        window.mountLavas();
     }
 }
 
