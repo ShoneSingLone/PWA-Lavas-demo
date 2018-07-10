@@ -196,8 +196,9 @@ if (!usingAppshell && ssr) {
                         let myDB = new MyDB("news", 1);
                         let db = await myDB.openDB();
                         let isFirst = false; //blog是否已经初始化数据
-                        if (!db.objectStoreNames.contains("blog")) {
+                        if (!myDB.haveTable("blog")) {
                             isFirst = true;
+                            debugger;
                             //新建表，并且第一次访问则肯定需要从仓库获取数据
                             let blogOStore = db.createObjectStore("blog", {
                                 "keyPath": "id"
@@ -210,6 +211,7 @@ if (!usingAppshell && ssr) {
                                 unique: false
                             });
                         }
+
                         //以上完成本地IndexedDB的检测与设置，则可设置indexedDB的state
                         app.$store.commit("common/setDBState", true);
                         // app.$store.commit("common/setDB", myDB);

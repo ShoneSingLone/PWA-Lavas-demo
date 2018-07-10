@@ -2,7 +2,7 @@
   <div class="detail-wrapper">
     <v-layout row wrap>
       <v-flex xs10 offset-xs1>
-        <article class="detail-content text-xs-center" v-if="blogDetail">
+        <article class="detail-content">
           <div v-html="blogDetail.content"></div>
         </article>
       </v-flex>
@@ -46,7 +46,8 @@ export default {
   },
   async asyncData({ store, route }) {
     blogDetail = await window.myDB.retrieve("blog", route.params.id);
-    setState(store, {
+    // await console.log("blogDetail", blogDetail);
+    await setState(store, {
       show: true,
       title: blogDetail.title,
       showMenu: false,
@@ -62,35 +63,35 @@ export default {
       ]
     });
 
-    console.log("_id.vue-asyncData");
+    // await console.log("_id.vue-asyncData");
   },
   computed: {},
   created() {
-    console.log("_id.vue-created");
-    console.dir(this);
+    // console.log("_id.vue-created");
+    // console.dir(this);
   },
   activated() {
-    console.log("_id.vue-activated");
+    // console.log("_id.vue-activated");
     this.setAppHeader(this.state.appHeaderState);
   },
   deactivated() {
-    console.log("_id.vue-deactivated");
+    // console.log("_id.vue-deactivated");
     this.setAppHeader(this.state.appHeaderState);
   }
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="scss" >
+// scoped 对【v-html生成的内容的样式生效】很不友好
 .detail-content {
   font-size: 16px;
   line-height: 30px;
   margin-top: 30px;
 
-  .detail-title {
-    margin-bottom: 20px;
-    padding: 10px 0;
-    font-size: 36px;
-    font-weight: bold;
+  p {
+    text-align: left;
+    text-indent: 2em;
+    // outline: 4px solid cyan;
   }
 }
 </style>

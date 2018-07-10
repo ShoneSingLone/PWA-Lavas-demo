@@ -15,7 +15,7 @@
                     </v-layout>
                   </v-container>
                 </v-card-media>
-                <v-card-text>
+                <v-card-text class="blog-desc">
                   {{ blog.desc }}
                 </v-card-text>
                 <v-card-actions>
@@ -161,6 +161,11 @@ export default {
   h2 {
     font-size: 46px;
     font-weight: 500;
+  }
+
+  .blog-desc {
+    text-align: left;
+    text-indent: 2em;
   }
 }
 </style>

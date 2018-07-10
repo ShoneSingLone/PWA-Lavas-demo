@@ -140,9 +140,13 @@ MyDB.prototype.openDB = function () {
 
         }
         openRequest.onerror = function (error) {
-            debugger;
             console.log("openDB　onerror");
             reject(error);
         }
     });
+}
+
+MyDB.prototype.haveTable = function (table) {
+    let self = this;
+    return self.db.objectStoreNames.contains(table);
 }

@@ -14,3 +14,15 @@ Base on [Lavas](https://lavas.baidu.com)，想利用（包括不限于）[FCC成
     - indexedDB可用
       - 如果indexedDB没有数据就从remote获取，然后存入indexedDB
   - 更新，从remote
+
+## 必须使用*nux系统
+
+```js
+const WebpackShellPlugin = require('webpack-shell-plugin');
+...
+onBuildExit: ['cp -Rf ./messidor/ ../../ShoneSingLone.github.io/']
+```
+
+在build之后，使用`cp`命令用移动dist（messido文件夹）到GithubPages根目录，所以window必须使用bash子系统，不然报错。
+
+## scope

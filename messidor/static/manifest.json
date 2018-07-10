@@ -1,9 +1,9 @@
 {
-    "start_url": "/?utm_source=homescreen",
+    "start_url": "/messidor",
+    "start_url_backup": "/?utm_source=homescreen",
     "name": "messidor",
     "short_name": "messidor",
-    "icons": [
-        {
+    "icons": [{
             "src": "img/icons/android-chrome-512x512.png",
             "type": "image/png",
             "sizes": "512x512"
